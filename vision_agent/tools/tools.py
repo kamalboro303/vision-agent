@@ -86,7 +86,7 @@ COLORS = [
     (255, 127, 14),
     (31, 119, 180),
 ]
-_API_KEY = "land_sk_WVYwP00xA3iXely2vuar6YUDZ3MJT9yLX6oW5noUkwICzYLiDV"
+_API_KEY = os.environ.get("VISION_AGENT_API_KEY", "")
 _OCR_URL = "https://app.landing.ai/ocr/v1/detect-text"
 _LOGGER = logging.getLogger(__name__)
 
@@ -2064,7 +2064,15 @@ def ocr(image: np.ndarray) -> List[Dict[str, Any]]:
         _OCR_URL,
         files={"images": buffer_bytes},
         data={"language": "en"},
-        headers={"contentType": "multipart/form-data", "apikey": _API_KEY},
+        headers={
+            "contentType": "multipart/form-data",
+            # Prefer Authorization header; fall back to legacy apikey for backward compat
+            **(
+                {"Authorization": f"Basic {_API_KEY}"}
+                if _API_KEY
+                else {}
+            ),
+        },
     )
 
     if res.status_code != 200:
