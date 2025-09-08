@@ -54,11 +54,10 @@ class OpenAILMM(LMM):
         **kwargs: Any,
     ):
         if not api_key:
+            # Let OpenAI SDK resolve key from environment
             self.client = OpenAI()
         else:
             self.client = OpenAI(api_key=api_key)
-
-        self.client = OpenAI(api_key=api_key)
         self.model_name = model_name
         self.image_size = image_size
         self.image_detail = image_detail
@@ -267,7 +266,8 @@ class OllamaLMM(LMM):
 
         if json_mode:
             self.kwargs["format"] = "json"  # type: ignore
-        self.kwargs["options"]["num_cxt"] = num_ctx
+        # Correct option name for Ollama context window
+        self.kwargs["options"]["num_ctx"] = num_ctx
 
     def __call__(
         self,
